@@ -6,7 +6,10 @@ export const setToken = (t) => (t ? localStorage.setItem(TOKEN_KEY, t) : localSt
 let onUnauthorized = () => {};
 export const setUnauthorizedHandler = (fn) => (onUnauthorized = fn);
 
-const TIMEOUT_MS = 10000;
+const API_BASE = ((import.meta.env && import.meta.env.VITE_API_URL) || '').replace(/\/+$/, '');
+const TIMEOUT_MS = API_BASE ? 45000 : 10000;
+
+
 
 async function request(path, { method = 'GET', body, raw = false } = {}) {
   const token = getToken();
@@ -15,7 +18,7 @@ async function request(path, { method = 'GET', body, raw = false } = {}) {
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   let res;
   try {
-    res = await fetch('/api' + path, {
+    res = await fetch(API_BASE + '/api' + path, {
       method,
       signal: controller.signal,
       headers: {
